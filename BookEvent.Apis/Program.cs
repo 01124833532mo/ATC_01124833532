@@ -1,4 +1,6 @@
 
+using BookEvent.Apis.Controller;
+
 namespace BookEvent.Apis
 {
     public class Program
@@ -9,7 +11,7 @@ namespace BookEvent.Apis
 
             // Add services to the container.
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers().AddApplicationPart(typeof(AssemblyInformation).Assembly);
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
