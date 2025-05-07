@@ -1,11 +1,14 @@
 ﻿using BookEvent.Core.Application.Abstraction.Services.Auth;
 using BookEvent.Core.Domain.Entities._Identity;
+using BookEvent.Shared.Errors.Models;
+using BookEvent.Shared.Models.Auth;
 using BookEvent.Shared.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace BookEvent.Core.Application.Services.Auth
@@ -17,6 +20,67 @@ namespace BookEvent.Core.Application.Services.Auth
     {
         private readonly JwtSettings _jwtsettings = jwtsettings.Value;
 
+        public async Task<UserToRetuen> GetRefreshToken(RefreshDto refreshDto, CancellationToken cancellationToken = default)
+        {
+            var userId = ValidateToken(refreshDto.Token);
+
+            if (userId is null) throw new NotFoundExeption("User id Not Found", nameof(userId));
+
+            var user = await userManager.FindByIdAsync(userId);
+            if (user is null) throw new NotFoundExeption("User Do Not Exists", nameof(user.Id));
+
+            var UserRefreshToken = user!.RefreshTokens.SingleOrDefault(x => x.Token == refreshDto.RefreshToken && x.IsActice);
+
+            if (UserRefreshToken is null) throw new NotFoundExeption("Invalid Token", nameof(userId));
+
+            UserRefreshToken.RevokedOn = DateTime.UtcNow;
+
+            var newtoken = await GenerateTokenAsync(user);
+
+            var newrefreshtoken = GenerateRefreshToken();
+
+            user.RefreshTokens.Add(new RefreshToken()
+            {
+                Token = newrefreshtoken.Token,
+                ExpireOn = newrefreshtoken.ExpireOn
+            });
+
+            await userManager.UpdateAsync(user);
+
+            return new UserToRetuen()
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Email = user.Email!,
+                PhoneNumber = user.PhoneNumber!,
+
+                Token = newtoken,
+                RefreshToken = newrefreshtoken.Token,
+                RefreshTokenExpirationDate = newrefreshtoken.ExpireOn,
+
+
+            };
+        }
+
+        public async Task<bool> RevokeRefreshTokenAsync(RefreshDto refreshDto, CancellationToken cancellationToken = default)
+        {
+            var userId = ValidateToken(refreshDto.Token);
+
+            if (userId is null) return false;
+
+            var user = await userManager.FindByIdAsync(userId);
+            if (user is null) return false;
+
+            var UserRefreshToken = user!.RefreshTokens.SingleOrDefault(x => x.Token == refreshDto.RefreshToken && x.IsActice);
+
+            if (UserRefreshToken is null) return false;
+
+            UserRefreshToken.RevokedOn = DateTime.UtcNow;
+
+            await userManager.UpdateAsync(user);
+            return true;
+        }
+
 
 
 
@@ -26,7 +90,76 @@ namespace BookEvent.Core.Application.Services.Auth
 
 
         #region Custom Functions
+        private async Task CheckRefreshToken(UserManager<ApplicationUser> userManager, ApplicationUser? user, UserToRetuen response)
+        {
+            if (user!.RefreshTokens.Any(t => t.IsActice))
+            {
+                var acticetoken = user.RefreshTokens.FirstOrDefault(x => x.IsActice);
+                response.RefreshToken = acticetoken!.Token;
+                response.RefreshTokenExpirationDate = acticetoken.ExpireOn;
+            }
+            else
+            {
 
+                var refreshtoken = GenerateRefreshToken();
+                response.RefreshToken = refreshtoken.Token;
+                response.RefreshTokenExpirationDate = refreshtoken.ExpireOn;
+
+                user.RefreshTokens.Add(new RefreshToken()
+                {
+                    Token = refreshtoken.Token,
+                    ExpireOn = refreshtoken.ExpireOn,
+                });
+                await userManager.UpdateAsync(user);
+            }
+        }
+        private RefreshToken GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+
+            var genrator = new RNGCryptoServiceProvider();
+
+            genrator.GetBytes(randomNumber);
+
+            return new RefreshToken()
+            {
+                Token = Convert.ToBase64String(randomNumber),
+                CreatedOn = DateTime.UtcNow,
+                ExpireOn = DateTime.UtcNow.AddDays(_jwtsettings.JWTRefreshTokenExpire)
+
+
+            };
+
+
+        }
+        private string? ValidateToken(string token)
+        {
+            var authkey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtsettings.Key));
+
+            var tokenhandler = new JwtSecurityTokenHandler();
+
+            try
+            {
+                tokenhandler.ValidateToken(token, new TokenValidationParameters()
+                {
+                    IssuerSigningKey = authkey,
+                    ValidateIssuerSigningKey = true,
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = false,
+                    ClockSkew = TimeSpan.Zero,
+                }, out SecurityToken securityToken);
+
+                var securitytokenobj = (JwtSecurityToken)securityToken;
+
+                return securitytokenobj.Claims.First(x => x.Type == ClaimTypes.PrimarySid).Value;
+            }
+            catch (Exception)
+            {
+
+                return null;
+            }
+        }
         private async Task<string> GenerateTokenAsync(ApplicationUser user)
         {
             var userclaims = await userManager.GetClaimsAsync(user);
