@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using BookEvent.Shared.Settings;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BookEvent.Shared
@@ -7,6 +8,8 @@ namespace BookEvent.Shared
     {
         public static IServiceCollection AddSharedDependency(this IServiceCollection services, IConfiguration configuration)
         {
+            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+
             return services;
         }
     }

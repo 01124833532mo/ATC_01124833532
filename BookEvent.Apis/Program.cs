@@ -1,13 +1,15 @@
+using BookEvent.Apis.Extentions;
 using BookEvent.Apis.MiddleWares;
 using BookEvent.Core.Application;
 using BookEvent.Infrastructure;
 using BookEvent.Infrastructure.Persistence;
+using BookEvent.Shared;
 
 namespace BookEvent.Apis
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -18,12 +20,16 @@ namespace BookEvent.Apis
             builder.Services.AddSwaggerGen();
 
             builder.Services.RegesteredPresestantLayer();
+            builder.Services.AddIdentityServices(builder.Configuration);
+
             builder.Services.AddApplicationServices(builder.Configuration);
             builder.Services.AddInfrastructureServices(builder.Configuration);
             builder.Services.AddPersistenceServices(builder.Configuration);
+            builder.Services.AddSharedDependency(builder.Configuration);
 
 
             var app = builder.Build();
+            await app.InitializerBookEventContextAsync();
 
             // Configure the HTTP request pipeline.
             app.UseMiddleware<ExeptionHandlerMiddleware>();
