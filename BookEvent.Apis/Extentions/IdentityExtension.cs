@@ -22,7 +22,7 @@ namespace BookEvent.Apis.Extentions
                 identityOptions.Lockout.MaxFailedAccessAttempts = 5;
                 identityOptions.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromHours(5);
                 identityOptions.User.RequireUniqueEmail = true;
-                identityOptions.SignIn.RequireConfirmedEmail = true;
+                identityOptions.SignIn.RequireConfirmedEmail = false;
                 identityOptions.SignIn.RequireConfirmedPhoneNumber = false;
 
             })

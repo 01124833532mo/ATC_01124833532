@@ -22,5 +22,12 @@ namespace BookEvent.Apis.Controller.Controllers.Auth
             return result is false ? BadRequest("Operation Not Successed") : Ok(result);
 
         }
+        [HttpPost("login")]
+
+        public async Task<ActionResult<UserToRetuen>> Login(LoginDto model)
+        {
+            var result = await serviceManager.AuthService.LoginAsync(model);
+            return Ok(result);
+        }
     }
 }

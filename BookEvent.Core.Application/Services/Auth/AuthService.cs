@@ -20,6 +20,49 @@ namespace BookEvent.Core.Application.Services.Auth
     {
         private readonly JwtSettings _jwtsettings = jwtsettings.Value;
 
+        public async Task<UserToRetuen> LoginAsync(LoginDto loginDto)
+        {
+            var user = await userManager.FindByEmailAsync(loginDto.Email);
+            if (user is null)
+            {
+                throw new UnAuthorizedExeption("Invalid Login");
+            }
+
+            var result = await signInManager.CheckPasswordSignInAsync(user, loginDto.Password, lockoutOnFailure: true);
+
+            if (result.IsNotAllowed)
+                throw new UnAuthorizedExeption("Email is Not Confirmed");
+
+            if (result.IsLockedOut)
+                throw new UnAuthorizedExeption("Email is Locked Out");
+
+            if (!result.Succeeded)
+                throw new UnAuthorizedExeption("Invalid Login");
+
+            var token = await GenerateTokenAsync(user);
+
+            var response = new UserToRetuen()
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Email = user.Email!,
+                PhoneNumber = user.PhoneNumber!,
+                Token = token
+
+            };
+            response.Token = token;
+            await CheckRefreshToken(userManager, user, response);
+            return response;
+
+
+
+
+
+
+        }
+
+
+
         public async Task<UserToRetuen> GetRefreshToken(RefreshDto refreshDto, CancellationToken cancellationToken = default)
         {
             var userId = ValidateToken(refreshDto.Token);
@@ -201,6 +244,8 @@ namespace BookEvent.Core.Application.Services.Auth
 
             return new JwtSecurityTokenHandler().WriteToken(tokenObj);
         }
+
+
         #endregion
 
     }
