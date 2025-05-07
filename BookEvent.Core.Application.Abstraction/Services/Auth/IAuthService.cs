@@ -1,4 +1,5 @@
 ﻿using BookEvent.Shared.Models.Auth;
+using System.Security.Claims;
 
 namespace BookEvent.Core.Application.Abstraction.Services.Auth
 {
@@ -10,6 +11,8 @@ namespace BookEvent.Core.Application.Abstraction.Services.Auth
         Task<UserToRetuen> LoginAsync(LoginDto loginDto);
 
         Task<UserToRetuen> RegisterAsync(RegisterDto registerDto);
+        Task<UserToRetuen> GetCurrentUser(ClaimsPrincipal claimsPrincipal);
+
 
     }
 }

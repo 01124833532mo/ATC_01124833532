@@ -300,6 +300,23 @@ namespace BookEvent.Core.Application.Services.Auth
 
         }
 
+        public async Task<UserToRetuen> GetCurrentUser(ClaimsPrincipal claimsPrincipal)
+        {
+            var userId = claimsPrincipal.FindFirst(ClaimTypes.PrimarySid)?.Value;
+            if (userId is null) throw new NotFoundExeption("User id Not Found", nameof(userId));
+            var user = await userManager.FindByIdAsync(userId);
+            if (user is null) throw new NotFoundExeption("User Do Not Exists", nameof(user.Id));
+            var response = new UserToRetuen()
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Email = user.Email!,
+                PhoneNumber = user.PhoneNumber!,
+                Token = GenerateTokenAsync(user).Result
+            };
+            return response;
+        }
+
         #endregion
 
     }

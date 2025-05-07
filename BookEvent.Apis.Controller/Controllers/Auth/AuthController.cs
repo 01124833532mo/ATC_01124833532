@@ -1,6 +1,7 @@
 ﻿using BookEvent.Apis.Controller.Controllers.Base;
 using BookEvent.Core.Application.Abstraction;
 using BookEvent.Shared.Models.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookEvent.Apis.Controller.Controllers.Auth
@@ -33,6 +34,13 @@ namespace BookEvent.Apis.Controller.Controllers.Auth
         public async Task<ActionResult<UserToRetuen>> Register(RegisterDto model)
         {
             var result = await serviceManager.AuthService.RegisterAsync(model);
+            return Ok(result);
+        }
+        [Authorize]
+        [HttpGet("GetCurrentUser")]
+        public async Task<ActionResult<UserToRetuen>> GetCurrentUser()
+        {
+            var result = await serviceManager.AuthService.GetCurrentUser(User);
             return Ok(result);
         }
     }
