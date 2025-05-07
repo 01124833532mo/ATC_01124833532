@@ -2,6 +2,7 @@
 using BookEvent.Core.Domain.Entities._Identity;
 using BookEvent.Shared.Errors.Models;
 using BookEvent.Shared.Models.Auth;
+using BookEvent.Shared.Models.Roles;
 using BookEvent.Shared.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -19,6 +20,40 @@ namespace BookEvent.Core.Application.Services.Auth
         , IOptions<JwtSettings> jwtsettings) : IAuthService
     {
         private readonly JwtSettings _jwtsettings = jwtsettings.Value;
+
+
+        public async Task<UserToRetuen> RegisterAsync(RegisterDto registerDto)
+        {
+            if (userManager.Users.Any(e => e.Email == registerDto.Email))
+                throw new BadRequestExeption("Email Already Exists");
+            if (userManager.Users.Any(e => e.PhoneNumber == registerDto.PhoneNumber))
+                throw new BadRequestExeption("Phone Number Already Exists");
+            var user = new ApplicationUser()
+            {
+                FullName = registerDto.FullName,
+                Email = registerDto.Email,
+                PhoneNumber = registerDto.PhoneNumber,
+                UserName = registerDto.Email,
+
+            };
+
+
+
+
+
+
+            var result = await userManager.CreateAsync(user, registerDto.Password);
+            if (!result.Succeeded)
+                throw new ValidationExeption { Errors = result.Errors.Select(p => p.Description) };
+
+            //await ConfirmationCodeSendByEmailAsync(new ForgetPasswordByEmailDto { Email = user.Email! });
+
+            var roleResult = await userManager.AddToRoleAsync(user, Roles.User);
+            if (!roleResult.Succeeded)
+                throw new ValidationExeption { Errors = roleResult.Errors.Select(e => e.Description) };
+
+            return CreateUserResponse(user);
+        }
 
         public async Task<UserToRetuen> LoginAsync(LoginDto loginDto)
         {
@@ -245,6 +280,25 @@ namespace BookEvent.Core.Application.Services.Auth
             return new JwtSecurityTokenHandler().WriteToken(tokenObj);
         }
 
+
+        private UserToRetuen CreateUserResponse(ApplicationUser user)
+        {
+
+
+
+            var response = new UserToRetuen
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Email = user.Email!,
+                PhoneNumber = user.PhoneNumber!,
+                Token = GenerateTokenAsync(user).Result,
+            };
+
+
+            return response;
+
+        }
 
         #endregion
 

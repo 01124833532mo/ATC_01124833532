@@ -9,7 +9,7 @@ namespace BookEvent.Core.Application.Abstraction.Services.Auth
         Task<bool> RevokeRefreshTokenAsync(RefreshDto refreshDto, CancellationToken cancellationToken = default);
         Task<UserToRetuen> LoginAsync(LoginDto loginDto);
 
-        //Task<BaseToReturn> RegisterAsync(RegisterDto registerDto);
+        Task<UserToRetuen> RegisterAsync(RegisterDto registerDto);
 
     }
 }

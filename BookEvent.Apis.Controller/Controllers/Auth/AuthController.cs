@@ -29,5 +29,11 @@ namespace BookEvent.Apis.Controller.Controllers.Auth
             var result = await serviceManager.AuthService.LoginAsync(model);
             return Ok(result);
         }
+        [HttpPost("register")]
+        public async Task<ActionResult<UserToRetuen>> Register(RegisterDto model)
+        {
+            var result = await serviceManager.AuthService.RegisterAsync(model);
+            return Ok(result);
+        }
     }
 }
