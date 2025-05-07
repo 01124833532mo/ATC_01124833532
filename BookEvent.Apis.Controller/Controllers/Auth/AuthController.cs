@@ -43,5 +43,13 @@ namespace BookEvent.Apis.Controller.Controllers.Auth
             var result = await serviceManager.AuthService.GetCurrentUser(User);
             return Ok(result);
         }
+        [Authorize]
+
+        [HttpPost("Change-Password")]
+        public async Task<ActionResult<ChangePasswordDto>> ChangePassword([FromBody] ChangePasswordDto changePasswordDto)
+        {
+            var result = await serviceManager.AuthService.ChangePasswordAsync(User, changePasswordDto);
+            return Ok(result);
+        }
     }
 }

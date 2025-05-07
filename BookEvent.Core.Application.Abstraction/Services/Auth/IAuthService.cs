@@ -13,6 +13,9 @@ namespace BookEvent.Core.Application.Abstraction.Services.Auth
         Task<UserToRetuen> RegisterAsync(RegisterDto registerDto);
         Task<UserToRetuen> GetCurrentUser(ClaimsPrincipal claimsPrincipal);
 
+        Task<ChangePasswordToReturn> ChangePasswordAsync(ClaimsPrincipal claims, ChangePasswordDto changePasswordDto);
+
+
 
     }
 }

@@ -317,6 +317,45 @@ namespace BookEvent.Core.Application.Services.Auth
             return response;
         }
 
+        public async Task<ChangePasswordToReturn> ChangePasswordAsync(ClaimsPrincipal claims, ChangePasswordDto changePasswordDto)
+        {
+            var userId = claims.FindFirst(ClaimTypes.PrimarySid)?.Value;
+
+            if (userId is null) throw new UnAuthorizedExeption("UnAuthorized , You Are Not Allowed");
+
+
+            // Retrieve the user from the database
+            var user = await userManager.FindByIdAsync(userId);
+
+            if (user is null) throw new NotFoundExeption("No User For This Id", nameof(userId));
+
+
+            // Verify the current password
+            var isCurrentPasswordValid = await userManager.CheckPasswordAsync(user, changePasswordDto.CurrentPassword);
+
+            if (!isCurrentPasswordValid)
+            {
+                throw new BadRequestExeption("This Current Password InCorrect");
+            }
+
+            // Change the password
+            var result = await userManager.ChangePasswordAsync(user, changePasswordDto.CurrentPassword, changePasswordDto.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                throw new ValidationExeption() { Errors = result.Errors.Select(p => p.Description) };
+            }
+
+            // Optionally, generate a new token for the user
+            var newToken = await GenerateTokenAsync(user);
+
+            return new ChangePasswordToReturn()
+            {
+                Message = "Password changed successfully.",
+                Token = newToken
+            };
+        }
+
         #endregion
 
     }
