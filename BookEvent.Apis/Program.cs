@@ -42,6 +42,9 @@ namespace BookEvent.Apis
 
             app.UseHttpsRedirection();
             app.UseStatusCodePagesWithReExecute("/Errors/{0}");
+            app.UseStaticFiles();
+
+            app.UseCors("BookEvent");
 
 
             app.UseAuthorization();

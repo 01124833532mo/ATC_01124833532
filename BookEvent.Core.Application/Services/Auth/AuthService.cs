@@ -271,7 +271,7 @@ namespace BookEvent.Core.Application.Services.Auth
 
                 issuer: _jwtsettings.Issuer,
                 audience: _jwtsettings.Audience,
-                expires: DateTime.UtcNow.AddMinutes(_jwtsettings.DurationInMinitutes),
+                expires: DateTime.UtcNow.AddDays(_jwtsettings.DurationInMinitutes),
                 claims: claims,
                 signingCredentials: signingCredentials
                 );

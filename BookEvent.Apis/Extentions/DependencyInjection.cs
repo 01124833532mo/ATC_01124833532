@@ -21,6 +21,19 @@ public static class DependencyInjection
                 return new BadRequestObjectResult(new ApiValidationErrorResponse() { Erroes = errors });
             };
         }).AddApplicationPart(typeof(AssemblyInformation).Assembly);
+        #region CORS
+        // To Do Allow SpecificOrigins
+        services.AddCors(corsOptions =>
+        {
+            corsOptions.AddPolicy("BookEvent", policyBuilder =>
+            {
+                policyBuilder.AllowAnyHeader()
+                             .AllowAnyMethod()
+                             .AllowAnyOrigin(); // Allow all domains
+            });
+        });
+
+        #endregion
         return services;
     }
 
