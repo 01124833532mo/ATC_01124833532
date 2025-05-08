@@ -21,6 +21,9 @@ namespace BookEvent.Core.Application.Abstraction.Services.Auth
 
         public Task<SuccessDto> ConfirmEmailAsync(ConfirmationEmailCodeDto codeDto);
 
+        Task<UserToRetuen> UpdateAppUserBySelf(ClaimsPrincipal claims, UpdateUserDto appUserDto);
+
+
 
 
 

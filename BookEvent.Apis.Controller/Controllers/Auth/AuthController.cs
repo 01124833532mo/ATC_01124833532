@@ -75,5 +75,12 @@ namespace BookEvent.Apis.Controller.Controllers.Auth
             var result = await serviceManager.AuthService.ConfirmEmailAsync(codeDto);
             return Ok(result);
         }
+        [Authorize]
+        [HttpPut("Update-User-By-Self")]
+        public async Task<ActionResult<UserToRetuen>> UpdateUserBySelf([FromBody] UpdateUserDto appUserDto)
+        {
+            var result = await serviceManager.AuthService.UpdateAppUserBySelf(User, appUserDto);
+            return Ok(result);
+        }
     }
 }

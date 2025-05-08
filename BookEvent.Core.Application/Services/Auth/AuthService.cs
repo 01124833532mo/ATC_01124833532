@@ -550,7 +550,24 @@ namespace BookEvent.Core.Application.Services.Auth
         }
 
 
+
+
         #endregion
+
+        public async Task<UserToRetuen> UpdateAppUserBySelf(ClaimsPrincipal claims, UpdateUserDto appUserDto)
+        {
+            var userId = claims.FindFirst(ClaimTypes.PrimarySid)?.Value;
+            if (userId is null) throw new UnAuthorizedExeption("UnAuthorized , You Are Not Allowed");
+            var user = await userManager.FindByIdAsync(userId);
+            if (user is null) throw new NotFoundExeption("No User For This Id", nameof(userId));
+            user.FullName = appUserDto.FullName;
+            user.PhoneNumber = appUserDto.PhoneNumber;
+            user.Email = appUserDto.Email;
+            var result = await userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+                throw new ValidationExeption { Errors = result.Errors.Select(p => p.Description) };
+            return CreateUserResponse(user);
+        }
 
     }
 }
