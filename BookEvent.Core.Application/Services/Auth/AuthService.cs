@@ -19,7 +19,6 @@ namespace BookEvent.Core.Application.Services.Auth
 {
     public class AuthService(UserManager<ApplicationUser> userManager
         , SignInManager<ApplicationUser> signInManager,
-        RoleManager<IdentityRole> roleManager,
         IEmailService emailService
         , IOptions<JwtSettings> jwtsettings) : IAuthService
     {
@@ -50,7 +49,9 @@ namespace BookEvent.Core.Application.Services.Auth
             if (!result.Succeeded)
                 throw new ValidationExeption { Errors = result.Errors.Select(p => p.Description) };
 
-            //await ConfirmationCodeSendByEmailAsync(new ForgetPasswordByEmailDto { Email = user.Email! });
+            var email = new SendCodeByEmailDto() { Email = user.Email! };
+
+            await SendCodeByEmail(email, true);
 
             var roleResult = await userManager.AddToRoleAsync(user, Roles.User);
             if (!roleResult.Succeeded)
@@ -99,7 +100,7 @@ namespace BookEvent.Core.Application.Services.Auth
 
 
         }
-        public async Task<SuccessDto> SendCodeByEmail(ForgetPasswordByEmailDto emailDto, bool IsRegistration = false)
+        public async Task<SuccessDto> SendCodeByEmail(SendCodeByEmailDto emailDto, bool IsRegistration = false)
         {
             var user = await userManager.Users.Where(u => u.Email == emailDto.Email).FirstOrDefaultAsync();
 
@@ -140,6 +141,35 @@ namespace BookEvent.Core.Application.Services.Auth
                 Status = "Success",
                 Message = IsRegistration ? "Confirmation code has been sent" : "Reset code has been sent"
             };
+        }
+
+        public async Task<SuccessDto> ConfirmEmailAsync(ConfirmationEmailCodeDto codeDto)
+        {
+            var user = await userManager.Users.FirstOrDefaultAsync(e => e.Email == codeDto.Email);
+
+            if (user is null)
+                throw new BadRequestExeption("Invalid Email");
+
+            if (user.ResetCode != codeDto.ConfirmationCode)
+                throw new BadRequestExeption("The Provided Code Is Invalid");
+
+            if (user.ResetCodeExpiry < DateTime.UtcNow)
+                throw new BadRequestExeption("The Provided Code Has Been Expired");
+
+            user.EmailConfirmed = true;
+
+            var result = await userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+                throw new BadRequestExeption("Something Went Wrong While Confirming Email");
+
+            var SuccessObj = new SuccessDto()
+            {
+                Status = "Success",
+                Message = "Email Has Been Confirmed"
+            };
+
+            return SuccessObj;
         }
 
         public async Task<SuccessDto> VerifyCodeByEmailAsync(ResetCodeConfirmationByEmailDto resetCodeDto)

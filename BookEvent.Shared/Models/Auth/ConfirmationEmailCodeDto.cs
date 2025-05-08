@@ -2,9 +2,11 @@
 
 namespace BookEvent.Shared.Models.Auth
 {
-    public class ResetCodeConfirmationByEmailDto : SendCodeByEmailDto
+    public class ConfirmationEmailCodeDto : SendCodeByEmailDto
     {
+
+
         [Required]
-        public required int ResetCode { get; set; }
+        public int ConfirmationCode { get; set; }
     }
 }

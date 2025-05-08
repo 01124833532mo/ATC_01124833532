@@ -2,7 +2,7 @@
 
 namespace BookEvent.Shared.Models.Auth
 {
-    public class ForgetPasswordByEmailDto
+    public class SendCodeByEmailDto
     {
 
         [Required]

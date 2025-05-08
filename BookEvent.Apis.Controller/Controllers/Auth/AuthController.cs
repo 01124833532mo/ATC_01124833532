@@ -52,7 +52,7 @@ namespace BookEvent.Apis.Controller.Controllers.Auth
             return Ok(result);
         }
         [HttpPost("Send-Code-By-Email")]
-        public async Task<ActionResult<SuccessDto>> SendCodeByEmail([FromBody] ForgetPasswordByEmailDto emailDto)
+        public async Task<ActionResult<SuccessDto>> SendCodeByEmail([FromBody] SendCodeByEmailDto emailDto)
         {
             var result = await serviceManager.AuthService.SendCodeByEmail(emailDto);
             return Ok(result);
@@ -67,6 +67,12 @@ namespace BookEvent.Apis.Controller.Controllers.Auth
         public async Task<ActionResult<UserToRetuen>> ResetPasswordByEmail([FromBody] ResetPasswordByEmailDto resetCodeDto)
         {
             var result = await serviceManager.AuthService.ResetPasswordByEmailAsync(resetCodeDto);
+            return Ok(result);
+        }
+        [HttpPost("Confirm-Email")]
+        public async Task<ActionResult<SuccessDto>> ConfirmEmail([FromBody] ConfirmationEmailCodeDto codeDto)
+        {
+            var result = await serviceManager.AuthService.ConfirmEmailAsync(codeDto);
             return Ok(result);
         }
     }

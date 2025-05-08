@@ -15,9 +15,12 @@ namespace BookEvent.Core.Application.Abstraction.Services.Auth
 
         Task<ChangePasswordToReturn> ChangePasswordAsync(ClaimsPrincipal claims, ChangePasswordDto changePasswordDto);
 
-        Task<SuccessDto> SendCodeByEmail(ForgetPasswordByEmailDto emailDto, bool IsRegistration = false);
+        Task<SuccessDto> SendCodeByEmail(SendCodeByEmailDto emailDto, bool IsRegistration = false);
         Task<SuccessDto> VerifyCodeByEmailAsync(ResetCodeConfirmationByEmailDto resetCodeDto);
         Task<UserToRetuen> ResetPasswordByEmailAsync(ResetPasswordByEmailDto resetCodeDto);
+
+        public Task<SuccessDto> ConfirmEmailAsync(ConfirmationEmailCodeDto codeDto);
+
 
 
 
