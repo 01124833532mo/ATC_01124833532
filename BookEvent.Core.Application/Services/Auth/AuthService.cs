@@ -1,4 +1,5 @@
 ﻿using BookEvent.Core.Application.Abstraction.Services.Auth;
+using BookEvent.Core.Application.Abstraction.Services.Emails;
 using BookEvent.Core.Domain.Entities._Identity;
 using BookEvent.Shared.Errors.Models;
 using BookEvent.Shared.Models.Auth;
@@ -16,7 +17,8 @@ namespace BookEvent.Core.Application.Services.Auth
 {
     public class AuthService(UserManager<ApplicationUser> userManager
         , SignInManager<ApplicationUser> signInManager,
-        RoleManager<IdentityRole> roleManager
+        RoleManager<IdentityRole> roleManager,
+        IEmailService emailService
         , IOptions<JwtSettings> jwtsettings) : IAuthService
     {
         private readonly JwtSettings _jwtsettings = jwtsettings.Value;
