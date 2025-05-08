@@ -51,5 +51,23 @@ namespace BookEvent.Apis.Controller.Controllers.Auth
             var result = await serviceManager.AuthService.ChangePasswordAsync(User, changePasswordDto);
             return Ok(result);
         }
+        [HttpPost("Send-Code-By-Email")]
+        public async Task<ActionResult<SuccessDto>> SendCodeByEmail([FromBody] ForgetPasswordByEmailDto emailDto)
+        {
+            var result = await serviceManager.AuthService.SendCodeByEmail(emailDto);
+            return Ok(result);
+        }
+        [HttpPost("Verify-Code-By-Email")]
+        public async Task<ActionResult<SuccessDto>> VerifyCodeByEmail([FromBody] ResetCodeConfirmationByEmailDto resetCodeDto)
+        {
+            var result = await serviceManager.AuthService.VerifyCodeByEmailAsync(resetCodeDto);
+            return Ok(result);
+        }
+        [HttpPut("Reset-Password-By-Email")]
+        public async Task<ActionResult<UserToRetuen>> ResetPasswordByEmail([FromBody] ResetPasswordByEmailDto resetCodeDto)
+        {
+            var result = await serviceManager.AuthService.ResetPasswordByEmailAsync(resetCodeDto);
+            return Ok(result);
+        }
     }
 }

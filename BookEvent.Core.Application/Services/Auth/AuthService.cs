@@ -2,10 +2,12 @@
 using BookEvent.Core.Application.Abstraction.Services.Emails;
 using BookEvent.Core.Domain.Entities._Identity;
 using BookEvent.Shared.Errors.Models;
+using BookEvent.Shared.Models._Common.Emails;
 using BookEvent.Shared.Models.Auth;
 using BookEvent.Shared.Models.Roles;
 using BookEvent.Shared.Settings;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -97,6 +99,99 @@ namespace BookEvent.Core.Application.Services.Auth
 
 
         }
+        public async Task<SuccessDto> SendCodeByEmail(ForgetPasswordByEmailDto emailDto, bool IsRegistration = false)
+        {
+            var user = await userManager.Users.Where(u => u.Email == emailDto.Email).FirstOrDefaultAsync();
+
+            if (user is null)
+                throw new BadRequestExeption("Invalid Email");
+
+            var code = RandomNumberGenerator.GetInt32(100_0, 999_9);
+            var codeExpire = DateTime.UtcNow.AddMinutes(15);
+
+            if (IsRegistration)
+            {
+                user.ResetCode = code;
+                user.ResetCodeExpiry = codeExpire;
+            }
+            else
+            {
+                user.ResetCode = code;
+                user.ResetCodeExpiry = codeExpire;
+            }
+
+            var result = await userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+                throw new BadRequestExeption("Something Went Wrong While Sending Code");
+
+            var email = new Email()
+            {
+                To = emailDto.Email,
+                Subject = IsRegistration ? "Confirm Your CarCare Account" : "Your CarCare Password Reset Code",
+                Body = IsRegistration ? BuildConfirmationEmail(code) : BuildResetPasswordEmail(code),
+                IsBodyHtml = true
+            };
+
+            await emailService.SendEmail(email);
+
+            return new SuccessDto()
+            {
+                Status = "Success",
+                Message = IsRegistration ? "Confirmation code has been sent" : "Reset code has been sent"
+            };
+        }
+
+        public async Task<SuccessDto> VerifyCodeByEmailAsync(ResetCodeConfirmationByEmailDto resetCodeDto)
+        {
+            var user = await userManager.Users.FirstOrDefaultAsync(e => e.Email == resetCodeDto.Email);
+
+            if (user is null)
+                throw new BadRequestExeption("Invalid Email");
+
+            if (user.ResetCode != resetCodeDto.ResetCode)
+                throw new BadRequestExeption("The Provided Code Is Invalid");
+
+            if (user.ResetCodeExpiry < DateTime.UtcNow)
+                throw new BadRequestExeption("The Provided Code Has Been Expired");
+
+            var SuccessObj = new SuccessDto()
+            {
+                Status = "Success",
+                Message = "Reset Code Is Verified, Please Proceed To Change Your Password"
+            };
+
+            return SuccessObj;
+        }
+
+        public async Task<UserToRetuen> ResetPasswordByEmailAsync(ResetPasswordByEmailDto resetCodeDto)
+        {
+            var user = await userManager.Users.FirstOrDefaultAsync(e => e.Email == resetCodeDto.Email);
+
+            if (user is null)
+                throw new BadRequestExeption("Invalid Email");
+
+            var RemovePass = await userManager.RemovePasswordAsync(user);
+
+            if (!RemovePass.Succeeded)
+                throw new BadRequestExeption("Something Went Wrong While Reseting Your Password");
+
+            var newPass = await userManager.AddPasswordAsync(user, resetCodeDto.NewPassword);
+
+            if (!newPass.Succeeded)
+                throw new BadRequestExeption("Something Went Wrong While Reseting Your Password");
+
+            var mappedUser = new UserToRetuen
+            {
+                FullName = user.FullName!,
+                Id = user.Id,
+                PhoneNumber = user.PhoneNumber!,
+                Email = user.Email!,
+                Token = await GenerateTokenAsync(user),
+            };
+
+            return mappedUser;
+        }
 
 
 
@@ -170,6 +265,72 @@ namespace BookEvent.Core.Application.Services.Auth
 
 
         #region Custom Functions
+
+
+        private string BuildResetPasswordEmail(int resetCode)
+        {
+            return $@"
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }}
+            .header {{ color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 10px; }}
+            .code {{ font-size: 24px; font-weight: bold; color: #e74c3c; margin: 20px 0; text-align: center; }}
+            .footer {{ margin-top: 20px; font-size: 12px; color: #7f8c8d; border-top: 1px solid #eee; padding-top: 10px; }}
+            .button {{ background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; }}
+        </style>
+    </head>
+    <body>
+        <div class='header'>
+            <h2>Password Reset Request</h2>
+        </div>
+        
+        <p>We received a request to reset your password. Please use the following verification code:</p>
+        
+        <div class='code'>{resetCode}</div>
+        
+        <p>This code will expire in <strong>15 minutes</strong>. If you didn't request this, please ignore this email or contact support if you have questions.</p>
+        
+        <div class='footer'>
+            <p>Thank you,<br>The Support Team</p>
+        </div>
+    </body>
+    </html>";
+        }
+        private string BuildConfirmationEmail(int confirmationCode)
+        {
+            return $@"
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }}
+        .header {{ color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 10px; }}
+        .code {{ font-size: 24px; font-weight: bold; color: #2ecc71; margin: 20px 0; text-align: center; }}
+        .footer {{ margin-top: 20px; font-size: 12px; color: #7f8c8d; border-top: 1px solid #eee; padding-top: 10px; }}
+        .button {{ background-color: #3498db; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; }}
+    </style>
+</head>
+<body>
+    <div class='header'>
+        <h2>Email Confirmation</h2>
+    </div>
+    
+    <p>Thank you for registering with us. Please use the following verification code to confirm your email:</p>
+    
+    <div class='code'>{confirmationCode}</div>
+    
+    <p>This code will expire in <strong>15 minutes</strong>. If you didn't register, please ignore this email.</p>
+    
+    <div class='footer'>
+        <p>Thank you,<br>The Support Team</p>
+    </div>
+</body>
+</html>";
+        }
+
+
         private async Task CheckRefreshToken(UserManager<ApplicationUser> userManager, ApplicationUser? user, UserToRetuen response)
         {
             if (user!.RefreshTokens.Any(t => t.IsActice))
@@ -357,6 +518,7 @@ namespace BookEvent.Core.Application.Services.Auth
                 Token = newToken
             };
         }
+
 
         #endregion
 
