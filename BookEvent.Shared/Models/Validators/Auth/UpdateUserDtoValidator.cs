@@ -2,7 +2,7 @@
 using BookEvent.Shared.Models.Auth;
 using FluentValidation;
 
-namespace BookEvent.Shared.Models.Validators
+namespace BookEvent.Shared.Models.Validators.Auth
 {
     public class UpdateUserDtoValidator : AbstractValidator<UpdateUserDto>
     {
