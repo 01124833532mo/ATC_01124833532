@@ -1,5 +1,6 @@
 ﻿using BookEvent.Apis.Controller.Controllers.Base;
 using BookEvent.Core.Application.Abstraction;
+using BookEvent.Core.Application.Abstraction.Common;
 using BookEvent.Shared.Models.Categories;
 using BookEvent.Shared.Models.Roles;
 using Microsoft.AspNetCore.Authorization;
@@ -39,8 +40,12 @@ namespace BookEvent.Apis.Controller.Controllers.Categories
             var result = await serviceManager.CategoriesService.GetCategoryAsync(id, cancellationToken);
             return NewResult(result);
         }
-
-
+        [HttpGet("GetAllCategories")]
+        public async Task<ActionResult<Pagination<CategoryDto>>> GetAllEvents([FromQuery] SpecParams specParams, CancellationToken cancellationToken)
+        {
+            var products = await serviceManager.CategoriesService.GetAllCategoriesAsynce(specParams, cancellationToken);
+            return Ok(products);
+        }
 
     }
 }

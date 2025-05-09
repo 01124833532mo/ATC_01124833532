@@ -1,9 +1,12 @@
 ﻿using AutoMapper;
 using BookEvent.Core.Application.Abstraction.Bases;
+using BookEvent.Core.Application.Abstraction.Common;
 using BookEvent.Core.Application.Abstraction.Services.Categories;
 using BookEvent.Core.Domain.Contracts.Persestence;
 using BookEvent.Core.Domain.Entities.Categories;
+using BookEvent.Core.Domain.Specifications.Categories;
 using BookEvent.Shared.Models.Categories;
+using Microsoft.EntityFrameworkCore;
 
 namespace BookEvent.Core.Application.Services.Categories
 {
@@ -91,6 +94,20 @@ namespace BookEvent.Core.Application.Services.Categories
 
             return Success(mappedCategory, 1);
 
+        }
+
+        public async Task<Pagination<CategoryDto>> GetAllCategoriesAsynce(SpecParams specParams, CancellationToken cancellationToken = default)
+        {
+            var spec = new CategoriesSpecification(specParams.PageSize, specParams.PageIndex);
+
+            var repo = unitOfWork.GetRepository<Category, int>();
+
+            var Categories = await repo.GetAllWithSpecAsync(spec);
+
+            var data = mapper.Map<IEnumerable<CategoryDto>>(Categories);
+            var count = await repo.GetQuarable().CountAsync();
+
+            return new Pagination<CategoryDto>(specParams.PageIndex, specParams.PageSize, count) { Data = data };
         }
     }
 }
