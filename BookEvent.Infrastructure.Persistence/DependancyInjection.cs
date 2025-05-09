@@ -25,6 +25,8 @@ namespace BookEvent.Infrastructure.Persistence
             services.AddScoped(typeof(AuditInterceptor));
             services.AddScoped(typeof(IBookEventDbInitializer), typeof(BookEventDbInitilzer));
             services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
+            services.AddScoped(typeof(IUnitOfWork), typeof(UnitOfWork.UnitOfWork));
+
 
             return services;
         }
