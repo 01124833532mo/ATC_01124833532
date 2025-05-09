@@ -14,8 +14,15 @@ namespace BookEvent.Core.Application.Services.Categories
             var categoryrepo = unitOfWork.GetRepository<Category, int>();
             var category = mapper.Map<Category>(categoryDto);
 
-            await categoryrepo.AddAsync(category);
+            try
+            {
+                await categoryrepo.AddAsync(category);
 
+            }
+            catch (Exception ex)
+            {
+                return BadRequest<CategoryToRetuen>(ex.Message);
+            }
             var compelete = await unitOfWork.CompleteAsync() > 0;
 
             if (!compelete) return BadRequest<CategoryToRetuen>("Error Occure While Creating Category");
@@ -26,10 +33,48 @@ namespace BookEvent.Core.Application.Services.Categories
             return Created(mappedresult);
 
 
+        }
 
 
 
+        public async Task<Response<CategoryToRetuen>> UpdateCategory(int id, CategoryDto categoryDto, CancellationToken cancellationToke = default)
+        {
+            var categoryrepo = unitOfWork.GetRepository<Category, int>();
+            var category = await categoryrepo.GetAsync(id, cancellationToke);
+            if (category is null) return NotFound<CategoryToRetuen>("Category Not Found");
+            mapper.Map(categoryDto, category);
+            try
+            {
+                categoryrepo.Update(category);
 
+            }
+            catch (Exception ex)
+            {
+                return BadRequest<CategoryToRetuen>(ex.Message);
+            }
+            var compelete = await unitOfWork.CompleteAsync() > 0;
+            if (!compelete) return BadRequest<CategoryToRetuen>("Error Occure While Updating Category");
+            var mappedresult = mapper.Map<CategoryToRetuen>(category);
+            return Success(mappedresult);
+        }
+
+        public async Task<Response<CategoryToRetuen>> DeleteCategory(int id, CancellationToken cancellationToken = default)
+        {
+            var categoryrepo = unitOfWork.GetRepository<Category, int>();
+            var category = await categoryrepo.GetAsync(id, cancellationToken);
+            if (category is null) return NotFound<CategoryToRetuen>("Category Not Found");
+            try
+            {
+                categoryrepo.Delete(category);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest<CategoryToRetuen>(ex.Message);
+            }
+            var compelete = await unitOfWork.CompleteAsync() > 0;
+            if (!compelete) return BadRequest<CategoryToRetuen>("Error Occure While Deleting Category");
+            var mappedresult = mapper.Map<CategoryToRetuen>(category);
+            return Deleted<CategoryToRetuen>();
         }
     }
 }
