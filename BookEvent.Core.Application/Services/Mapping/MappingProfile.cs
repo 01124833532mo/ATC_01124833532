@@ -8,7 +8,7 @@ namespace BookEvent.Core.Application.Services.Mapping
     {
         public MappingProfile()
         {
-            CreateMap<CategoryDto, Category>();
+            CreateMap<CategoryDto, Category>().ReverseMap();
             CreateMap<Category, CategoryToRetuen>();
 
 

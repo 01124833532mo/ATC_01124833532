@@ -76,5 +76,21 @@ namespace BookEvent.Core.Application.Services.Categories
             var mappedresult = mapper.Map<CategoryToRetuen>(category);
             return Deleted<CategoryToRetuen>();
         }
+
+        public async Task<Response<CategoryDto>> GetCategoryAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var repo = unitOfWork.GetRepository<Category, int>();
+            var category = await repo.GetAsync(id, cancellationToken);
+
+            if (category is null)
+            {
+                return NotFound<CategoryDto>(id, "Category Not Found With This Id");
+            }
+
+            var mappedCategory = mapper.Map<CategoryDto>(category);
+
+            return Success(mappedCategory, 1);
+
+        }
     }
 }
