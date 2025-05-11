@@ -7,7 +7,7 @@ namespace BookEvent.Core.Application.Services.Mapping
 {
     public class EventPictureUrlResolver(IConfiguration configuration) : IValueResolver<Event, EventResponse, string?>
     {
-        public string? Resolve(Event source, EventResponse destination, string destMember, ResolutionContext context)
+        public string? Resolve(Event source, EventResponse destination, string? destMember, ResolutionContext context)
         {
             if (!string.IsNullOrEmpty(source.ImagePath))
             {

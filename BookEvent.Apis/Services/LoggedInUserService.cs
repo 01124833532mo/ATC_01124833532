@@ -7,6 +7,7 @@ namespace BookEvent.Apis.Services
     {
         private readonly IHttpContextAccessor? _httpcontextAccessor;
         public string? UserId { get; set; }
+        public string? FullName { get; set; }
 
         public LoggedInUserService(IHttpContextAccessor? contextAccessor)
         {
@@ -14,6 +15,7 @@ namespace BookEvent.Apis.Services
 
 
             UserId = _httpcontextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.PrimarySid);
+            FullName = _httpcontextAccessor?.HttpContext?.User.FindFirstValue(ClaimTypes.Name);
         }
 
     }
