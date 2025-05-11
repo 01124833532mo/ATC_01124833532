@@ -18,6 +18,13 @@ namespace BookEvent.Apis.Controller.Controllers.Events
             var result = await serviceManager.EventService.CreateEventAsync(eventdto, cancellationToken);
             return NewResult(result);
         }
+        [Authorize(Roles = Roles.Admin)]
+        [HttpPut("UpdateEvent/{id}")]
+        public async Task<ActionResult> UpdateEvent([FromRoute] int id, [FromForm] EventDto eventdto, CancellationToken cancellationToken)
+        {
+            var result = await serviceManager.EventService.UpdateEventAsync(id, eventdto, cancellationToken);
+            return NewResult(result);
+        }
 
 
     }

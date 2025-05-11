@@ -46,5 +46,38 @@ namespace BookEvent.Core.Application.Services.Events
             return Created(eventResponse);
 
         }
+
+        public async Task<Response<EventResponse>> UpdateEventAsync(int id, EventDto eventRequest, CancellationToken cancellationToken)
+        {
+            var eventRepo = unitOfWork.GetRepository<Event, int>();
+            var eventEntity = await eventRepo.GetAsync(id, cancellationToken);
+            if (eventEntity is null) return NotFound<EventResponse>("Event Not Found");
+            var category = await unitOfWork.GetRepository<Category, int>().GetAsync(eventRequest.CategoryId ?? 0, cancellationToken);
+            if (category is null) return NotFound<EventResponse>("Category Not Found");
+
+            mapper.Map(eventRequest, eventEntity);
+
+            if (eventRequest.ImagePath is not null)
+            {
+                var imagePath = await attachmentService.UploadAsynce(eventRequest.ImagePath, "Events");
+                if (imagePath is null)
+                {
+                    return BadRequest<EventResponse>("Error Occure While Updating Category");
+                }
+                eventEntity.ImagePath = imagePath;
+            }
+            try
+            {
+                eventRepo.Update(eventEntity);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest<EventResponse>(ex.Message);
+            }
+            var complete = await unitOfWork.CompleteAsync() > 0;
+            if (!complete) return BadRequest<EventResponse>("Error Occure While Updating Event");
+            var eventResponse = mapper.Map<EventResponse>(eventEntity);
+            return Success(eventResponse);
+        }
     }
 }
