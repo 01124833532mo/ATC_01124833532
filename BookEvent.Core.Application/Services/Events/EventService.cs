@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using BookEvent.Core.Application.Abstraction.Bases;
+using BookEvent.Core.Application.Abstraction.Common;
 using BookEvent.Core.Application.Abstraction.Common.Contracts.Infrastracture;
 using BookEvent.Core.Application.Abstraction.Services.Events;
 using BookEvent.Core.Domain.Contracts.Persestence;
 using BookEvent.Core.Domain.Entities.Categories;
 using BookEvent.Core.Domain.Entities.Events;
+using BookEvent.Core.Domain.Specifications.Events;
 using BookEvent.Shared.Models.Events;
 
 namespace BookEvent.Core.Application.Services.Events
@@ -100,6 +102,36 @@ namespace BookEvent.Core.Application.Services.Events
             return Success("Event Deleted Successfully");
 
         }
+
+
+        public async Task<Pagination<EventResponse>> GetAllEventsAsynce(SpecParams specParams, CancellationToken cancellationToken = default)
+        {
+
+
+            var spec = new EventSpecification(specParams.Search, specParams.CategoryId, specParams.Sort, specParams.PageSize, specParams.PageIndex);
+            var eventRepo = unitOfWork.GetRepository<Event, int>();
+            var events = await eventRepo.GetAllWithSpecAsync(spec);
+            var data = mapper.Map<IEnumerable<EventResponse>>(events);
+            var countspec = new EventWithFiltrationCountSpecification(specParams.Search, specParams.CategoryId);
+            var count = await eventRepo.GetCountAsync(spec, cancellationToken);
+            return new Pagination<EventResponse>(specParams.PageIndex, specParams.PageSize, count) { Data = data };
+
+        }
+
+        public async Task<Response<EventResponse>> GetEventAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var spec = new EventSpecification(id);
+            var eventRepo = unitOfWork.GetRepository<Event, int>();
+            var eventEntity = await eventRepo.GetWithSpecAsync(spec, cancellationToken);
+            if (eventEntity is null)
+            {
+                return NotFound<EventResponse>(id, "Event Not Found With This Id");
+            }
+            var mappedEvent = mapper.Map<EventResponse>(eventEntity);
+            return Success(mappedEvent, 1);
+
+        }
+
 
     }
 }

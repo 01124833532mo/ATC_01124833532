@@ -1,5 +1,6 @@
 ﻿using BookEvent.Apis.Controller.Controllers.Base;
 using BookEvent.Core.Application.Abstraction;
+using BookEvent.Core.Application.Abstraction.Common;
 using BookEvent.Shared.Models.Events;
 using BookEvent.Shared.Models.Roles;
 using Microsoft.AspNetCore.Authorization;
@@ -31,6 +32,18 @@ namespace BookEvent.Apis.Controller.Controllers.Events
         {
             var result = await serviceManager.EventService.DeleteAsync(id, cancellationToken);
             return NewResult(result);
+        }
+        [HttpGet("GetEvent/{id}")]
+        public async Task<ActionResult> GetEvent([FromRoute] int id, CancellationToken cancellationToken)
+        {
+            var result = await serviceManager.EventService.GetEventAsync(id, cancellationToken);
+            return NewResult(result);
+        }
+        [HttpGet("GetAllEvents")]
+        public async Task<ActionResult<Pagination<EventResponse>>> GetAllEvents([FromQuery] SpecParams specParams, CancellationToken cancellationToken)
+        {
+            var products = await serviceManager.EventService.GetAllEventsAsynce(specParams, cancellationToken);
+            return Ok(products);
         }
 
 
