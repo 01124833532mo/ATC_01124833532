@@ -47,6 +47,7 @@ namespace BookEvent.Core.Application.Services.Events
 
         }
 
+
         public async Task<Response<EventResponse>> UpdateEventAsync(int id, EventDto eventRequest, CancellationToken cancellationToken)
         {
             var eventRepo = unitOfWork.GetRepository<Event, int>();
@@ -79,5 +80,26 @@ namespace BookEvent.Core.Application.Services.Events
             var eventResponse = mapper.Map<EventResponse>(eventEntity);
             return Success(eventResponse);
         }
+
+
+        public async Task<Response<string>> DeleteAsync(int id, CancellationToken cancellationToken = default)
+        {
+            var eventRepo = unitOfWork.GetRepository<Event, int>();
+            var eventEntity = await eventRepo.GetAsync(id, cancellationToken);
+            if (eventEntity is null) return NotFound<string>("Event Not Found");
+            try
+            {
+                eventRepo.Delete(eventEntity);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest<string>(ex.Message);
+            }
+            var complete = await unitOfWork.CompleteAsync() > 0;
+            if (!complete) return BadRequest<string>("Error Occure While Deleting Event");
+            return Success("Event Deleted Successfully");
+
+        }
+
     }
 }

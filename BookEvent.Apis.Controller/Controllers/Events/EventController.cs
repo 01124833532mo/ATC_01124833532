@@ -25,6 +25,13 @@ namespace BookEvent.Apis.Controller.Controllers.Events
             var result = await serviceManager.EventService.UpdateEventAsync(id, eventdto, cancellationToken);
             return NewResult(result);
         }
+        [Authorize(Roles = Roles.Admin)]
+        [HttpDelete("DeleteEvent/{id}")]
+        public async Task<ActionResult> DeleteEvent([FromRoute] int id, CancellationToken cancellationToken)
+        {
+            var result = await serviceManager.EventService.DeleteAsync(id, cancellationToken);
+            return NewResult(result);
+        }
 
 
     }
