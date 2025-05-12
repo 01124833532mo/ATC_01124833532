@@ -7,11 +7,32 @@ using BookEvent.Core.Domain.Entities.Books;
 using BookEvent.Core.Domain.Entities.Events;
 using BookEvent.Shared.Models.Booking;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace BookEvent.Core.Application.Services.Booking
 {
     public class BookService(IUnitOfWork unitOfWork, IMapper mapper, ILoggedInUserService userService) : ResponseHandler, IBookService
     {
+        public async Task<Response<string>> CancelBookAsync(ClaimsPrincipal principal, int id, CancellationToken cancellationToken = default)
+        {
+            var bookrepo = unitOfWork.GetRepository<Book, int>();
+            var checkexsistingbook = await bookrepo.GetAsync(id, cancellationToken);
+
+            if (checkexsistingbook is null)
+                return NotFound<string>("Booking Not Found");
+
+            var userid = principal.FindFirstValue(ClaimTypes.PrimarySid);
+            if (checkexsistingbook!.UserId != userid)
+                return Unauthorized<string>("You Are Not Authorized to Cancel This Booking");
+
+            bookrepo.Delete(checkexsistingbook);
+            var complete = await unitOfWork.CompleteAsync() > 0;
+            if (!complete) return BadRequest<string>("Error Occured While Cancelling Booking");
+            return Deleted<string>("Booking Cancelled Successfully");
+
+
+        }
+
         public async Task<Response<BookToReturn>> CreateBookAsync(CreateBookDto createBookDto, CancellationToken cancellationToken)
         {
             var existingEvent = await unitOfWork.GetRepository<Event, int>().GetAsync(createBookDto.EventId, cancellationToken);

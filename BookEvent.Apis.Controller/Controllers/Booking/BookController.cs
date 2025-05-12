@@ -18,5 +18,11 @@ namespace BookEvent.Apis.Controller.Controllers.Booking
             return NewResult(result);
 
         }
+        [HttpDelete("CancelBook/{id}")]
+        public async Task<ActionResult> CancelBook(int id, CancellationToken cancellationToken)
+        {
+            var result = await serviceManager.BookService.CancelBookAsync(User, id, cancellationToken);
+            return NewResult(result);
+        }
     }
 }
