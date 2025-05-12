@@ -11,6 +11,8 @@ namespace BookEvent.Core.Application.Abstraction.Services.Booking
 
         Task<Response<string>> CancelBookAsync(ClaimsPrincipal principal, int id, CancellationToken cancellationToken = default);
 
+        Task<Response<IReadOnlyList<BookToReturn>>> GetAllBooksForUserAsync(ClaimsPrincipal principal, CancellationToken cancellationToken = default);
+
 
     }
 }

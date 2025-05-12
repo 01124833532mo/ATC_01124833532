@@ -72,5 +72,23 @@ namespace BookEvent.Core.Application.Services.Booking
             return Created(bookToReturn);
 
         }
+
+        public async Task<Response<IReadOnlyList<BookToReturn>>> GetAllBooksForUserAsync(ClaimsPrincipal principal, CancellationToken cancellationToken = default)
+        {
+            var bookrepo = unitOfWork.GetRepository<Book, int>();
+            var userid = principal.FindFirstValue(ClaimTypes.PrimarySid);
+            var books = await bookrepo
+                .GetQuarable()
+                .Include(b => b.Event)
+                .Include(b => b.User)
+                .Where(b => b.UserId == userid)
+                .ToListAsync(cancellationToken);
+            if (books is null || books.Count == 0)
+                return NotFound<IReadOnlyList<BookToReturn>>("No Bookings Found");
+            var bookToReturn = mapper.Map<IReadOnlyList<BookToReturn>>(books);
+            var count = books.Count;
+
+            return Success(bookToReturn, count);
+        }
     }
 }

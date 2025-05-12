@@ -32,7 +32,9 @@ namespace BookEvent.Core.Application.Services.Mapping
                 .ForMember(dest => dest.EventVenue, opt => opt.MapFrom(src => src.Event.Venue))
                 .ForMember(dest => dest.ImagePath, opt => opt.MapFrom<PictureOfEventINBoogingResolver>())
                 .ForMember(dest => dest.EventPrice, opt => opt.MapFrom(src => src.Event.Price))
-                .ForMember(dest => dest.BookingDate, opt => opt.MapFrom(src => src.BookingDate));
+                .ForMember(dest => dest.BookingDate, opt => opt.MapFrom(src => src.BookingDate))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.FullName));
+
 
 
 

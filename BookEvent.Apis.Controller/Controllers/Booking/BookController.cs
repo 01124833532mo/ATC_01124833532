@@ -24,5 +24,11 @@ namespace BookEvent.Apis.Controller.Controllers.Booking
             var result = await serviceManager.BookService.CancelBookAsync(User, id, cancellationToken);
             return NewResult(result);
         }
+        [HttpGet("GetAllBooksForUser")]
+        public async Task<ActionResult> GetAllBooksForUser(CancellationToken cancellationToken)
+        {
+            var result = await serviceManager.BookService.GetAllBooksForUserAsync(User, cancellationToken);
+            return NewResult(result);
+        }
     }
 }
