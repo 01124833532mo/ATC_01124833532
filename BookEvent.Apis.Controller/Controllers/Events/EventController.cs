@@ -1,4 +1,5 @@
 ﻿using BookEvent.Apis.Controller.Controllers.Base;
+using BookEvent.Apis.Controller.Filters;
 using BookEvent.Core.Application.Abstraction;
 using BookEvent.Core.Application.Abstraction.Common;
 using BookEvent.Shared.Models.Events;
@@ -39,6 +40,7 @@ namespace BookEvent.Apis.Controller.Controllers.Events
             var result = await serviceManager.EventService.GetEventAsync(id, cancellationToken);
             return NewResult(result);
         }
+        [Cached(10)]
         [HttpGet("GetAllEvents")]
         public async Task<ActionResult<Pagination<EventResponse>>> GetAllEvents([FromQuery] SpecParams specParams, CancellationToken cancellationToken)
         {
