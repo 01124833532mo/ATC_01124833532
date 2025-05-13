@@ -96,7 +96,7 @@ namespace BookEvent.Core.Application.Services.Categories
 
         }
 
-        public async Task<Pagination<CategoryDto>> GetAllCategoriesAsynce(SpecParams specParams, CancellationToken cancellationToken = default)
+        public async Task<Pagination<CategoryToRetuen>> GetAllCategoriesAsynce(SpecParams specParams, CancellationToken cancellationToken = default)
         {
             var spec = new CategoriesSpecification(specParams.PageSize, specParams.PageIndex);
 
@@ -104,10 +104,10 @@ namespace BookEvent.Core.Application.Services.Categories
 
             var Categories = await repo.GetAllWithSpecAsync(spec);
 
-            var data = mapper.Map<IEnumerable<CategoryDto>>(Categories);
+            var data = mapper.Map<IEnumerable<CategoryToRetuen>>(Categories);
             var count = await repo.GetQuarable().CountAsync();
 
-            return new Pagination<CategoryDto>(specParams.PageIndex, specParams.PageSize, count) { Data = data };
+            return new Pagination<CategoryToRetuen>(specParams.PageIndex, specParams.PageSize, count) { Data = data };
         }
     }
 }

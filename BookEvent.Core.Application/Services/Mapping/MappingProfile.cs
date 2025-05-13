@@ -13,7 +13,9 @@ namespace BookEvent.Core.Application.Services.Mapping
         public MappingProfile()
         {
             CreateMap<CategoryDto, Category>().ReverseMap();
-            CreateMap<Category, CategoryToRetuen>();
+            CreateMap<Category, CategoryToRetuen>()
+                                 .ForMember(dest => dest.Id, otp => otp.MapFrom(src => src.Id));
+
 
             CreateMap<EventDto, Event>().ReverseMap();
 

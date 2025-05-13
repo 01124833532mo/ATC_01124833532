@@ -11,7 +11,7 @@ namespace BookEvent.Core.Application.Abstraction.Services.Categories
         public Task<Response<CategoryToRetuen>> DeleteCategory(int id, CancellationToken cancellationToken = default);
         public Task<Response<CategoryDto>> GetCategoryAsync(int id, CancellationToken cancellationToken = default);
 
-        Task<Pagination<CategoryDto>> GetAllCategoriesAsynce(SpecParams specParams, CancellationToken cancellationToken = default);
+        Task<Pagination<CategoryToRetuen>> GetAllCategoriesAsynce(SpecParams specParams, CancellationToken cancellationToken = default);
 
     }
 }
