@@ -59,7 +59,7 @@ Admin
 - **Database:** SQL Server, Redis  
 - **Authentication:** Identity, JWT  
 - **Documentation & Testing:** Swagger, Postman, HTTP files
-- **Front End:** Implement Full Componet Of Project With React.js
+- **Front End:** Implement Full Componet Of Project With React.js And Folder Name Front End
 
 ## 🚀 Deployment
 
