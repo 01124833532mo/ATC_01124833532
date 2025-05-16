@@ -13,6 +13,12 @@ namespace BookEvent.Infrastructure.Persistence._Data.Configuration.identity
                 .IsRequired()
                 .HasMaxLength(100);
 
+            builder.HasMany(x => x.Books)
+                .WithOne(x => x.User)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+
         }
     }
 

@@ -1,4 +1,6 @@
 ﻿using BookEvent.Apis.Controller;
+using BookEvent.Apis.Services;
+using BookEvent.Core.Application.Abstraction;
 using BookEvent.Shared.Errors.Response;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,6 +36,9 @@ public static class DependencyInjection
         });
 
         #endregion
+
+        services.AddScoped(typeof(ILoggedInUserService), typeof(LoggedInUserService));
+        services.AddHttpContextAccessor();
         return services;
     }
 

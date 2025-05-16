@@ -24,4 +24,8 @@
     <ProjectReference Include="..\BookEvent.Shared\BookEvent.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\images\Events\" />
+  </ItemGroup>
+
 </Project>
