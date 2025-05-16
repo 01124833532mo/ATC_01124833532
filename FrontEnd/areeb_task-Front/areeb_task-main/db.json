@@ -1,0 +1,21 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "username": "mahmoud",
+      "email": "mahmoud@gmail.com",
+      "password": "01000405726",
+      "phone": "01000405726",
+      "role": "admin"
+    },
+    {
+      "id": "161e",
+      "username": "mahmoud",
+      "email": "mahmoud010@gmail.com",
+      "phone": "01000405726",
+      "password": "01027938060",
+      "role": "user"
+    }
+ 
+  ]
+}
