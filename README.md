@@ -76,21 +76,14 @@ This project helped me:
 4. Deploy a production-ready API with robust **security** and **caching mechanisms**.
 
 ## 📘 Archetcture
-BookEventTask/
-├── Apis/                           - API Layer
-│   ├── BookEvent.Apis/             - Main API project (currently not found)
-│   └── BookEvent.Apis.Controller/   - API Controllers (currently not found)
-│
-├── Core/                           - Core Business Logic
-│   ├── BookEvent.Core.Application/          - Application services
-│   ├── BookEvent.Core.Application.Abstracti - Application abstractions/interfaces
-│   └── BookEvent.Core.Domain/               - Domain models (currently not found)
-│
-├── Infrastructure/                 - Infrastructure/Data Access
-│   ├── BookEvent.Infrastructure/           - Infrastructure implementation (currently not found)
-│   └── BookEvent.Infrastructure.Persistence/ - Persistence layer (marked as shared)
-│
-└── BookEvent.Shared/               - Shared components (currently not found)
+### Layer Responsibilities
+
+| Layer          | Responsibilities                          | Projects |
+|----------------|------------------------------------------|----------|
+| **API**        | HTTP endpoints, authentication, DTOs     | BookEvent.Apis, BookEvent.Apis.Controller |
+| **Core**       | Business logic, domain models, interfaces| BookEvent.Core.* |
+| **Infrastructure** | Data access, external services       | BookEvent.Infrastructure.* |
+| **Shared**     | Common utilities, shared contracts       | BookEvent.Shared |
 
 
  ## 📬 Contact
