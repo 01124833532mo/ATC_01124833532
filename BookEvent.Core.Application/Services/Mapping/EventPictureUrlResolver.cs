@@ -11,7 +11,7 @@ namespace BookEvent.Core.Application.Services.Mapping
         {
             if (!string.IsNullOrEmpty(source.ImagePath))
             {
-                return $"{configuration["Urls:ApiBaseUrl"]}/{source.ImagePath}";
+                return $"{configuration["Urls:BookEventUrl"]}/{source.ImagePath}";
             }
             return string.Empty;
 
