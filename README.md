@@ -75,6 +75,24 @@ This project helped me:
 3. Integrate external services like  and **Redis** seamlessly.
 4. Deploy a production-ready API with robust **security** and **caching mechanisms**.
 
+## 📘 Archetcture
+BookEventTask/
+├── Apis/                           - API Layer
+│   ├── BookEvent.Apis/             - Main API project (currently not found)
+│   └── BookEvent.Apis.Controller/   - API Controllers (currently not found)
+│
+├── Core/                           - Core Business Logic
+│   ├── BookEvent.Core.Application/          - Application services
+│   ├── BookEvent.Core.Application.Abstracti - Application abstractions/interfaces
+│   └── BookEvent.Core.Domain/               - Domain models (currently not found)
+│
+├── Infrastructure/                 - Infrastructure/Data Access
+│   ├── BookEvent.Infrastructure/           - Infrastructure implementation (currently not found)
+│   └── BookEvent.Infrastructure.Persistence/ - Persistence layer (marked as shared)
+│
+└── BookEvent.Shared/               - Shared components (currently not found)
+
+
  ## 📬 Contact
 
 Feel free to reach out to me:
