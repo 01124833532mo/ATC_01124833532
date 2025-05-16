@@ -86,6 +86,23 @@ This project helped me:
 | **Shared**     | Common utilities, shared contracts       | BookEvent.Shared |
 
 
+BookEventTask/
+├── Apis/ # API Layer
+│ ├── BookEvent.Apis/ # Main API project
+│ └── BookEvent.Apis.Controller/ # API Controllers
+│
+├── Core/ # Core Business Logic
+│ ├── BookEvent.Core.Application/ # Application services
+│ ├── BookEvent.Core.Application.Abstracti # Interfaces
+│ └── BookEvent.Core.Domain/ # Domain models
+│
+├── Infrastructure/ # Infrastructure
+│ ├── BookEvent.Infrastructure/ # Infrastructure impl
+│ └── BookEvent.Infrastructure.Persistence/ # Persistence
+│
+└── BookEvent.Shared/ # Shared components
+
+
  ## 📬 Contact
 
 Feel free to reach out to me:
