@@ -65,6 +65,7 @@ Admin
 
 1. **Production-ready deployment:** Configured with **MonsterApi**.
 2. **Caching:** Integrated **Redis** for performance optimization.
+3. **Deploy:** [[Book-Event-Service](http://areeb-task-git-main-mahmoudshaaban00s-projects.vercel.app)]
 
 ## 📘 Key Learnings
 
